@@ -20,9 +20,12 @@ class Client
 	private $_useragent = "Peeralytics PHP";
 	private $_secret;
 	private $_prefix;
+	private $_initialized;
+	private $_cookieFile;
+
 	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu:5000";
 
-	public function __construct($appId , $secret, $destination = Client::DEFAULT_ROUTE){ 
+	public function __construct($appId , $secret, $destination = Client::DEFAULT_ROUTE, $keepCookies = true){
 		if(strlen($destination)==null || $destination===null){
 			$destination = Client::DEFAULT_ROUTE;
 		}
@@ -30,7 +33,13 @@ class Client
 		$this->_endpoint = $destination;
 		$this->_appId = $appId;
 		$this->_secret = $secret;
+		$this->_initialized = false;
 		$this->curl = curl_init();
+		$this->_cookieFile = "./cookie.tmp";
+		if($keepCookies){
+			curl_setopt( $this->curl, CURLOPT_COOKIEJAR, $this->_cookieFile);
+			curl_setopt( $this->curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
+		}
 	}
 
 	/**
