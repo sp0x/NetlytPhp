@@ -164,7 +164,7 @@ class Client
 		curl_close($this->curl);
 	}
 
-	private function __destruct()
+	function __destruct()
 	{
 		if(file_exists($this->_cookieFile)){
 			try{
