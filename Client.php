@@ -164,8 +164,19 @@ class Client
 		curl_close($this->curl);
 	}
 
+	private function __destruct()
+	{
+		if(file_exists($this->_cookieFile)){
+			try{
+				unlink($this->_cookieFile);
+			}catch(\Exception $e){
 
- 	private function xorString($data){
+			}
+		}
+	}
+
+
+	private function xorString($data){
 		// Our output text
 		$outText = '';
 		// Iterate through each character
