@@ -20,7 +20,7 @@ class Client
 	private $_useragent = "Peeralytics PHP";
 	private $_secret;
 	private $_prefix;
-	const DEFAULT_ROUTE = "http://localhost:5000/api";
+	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu:5000";
 
 	public function __construct($appId , $secret, $destination = Client::DEFAULT_ROUTE){ 
 		if(strlen($destination)==null || $destination===null){
@@ -71,9 +71,8 @@ class Client
 		//Data parsing
 		if($data!==null){
 			if(is_string($data)){
-				$requestBodyHash = $data;
 			}else{
-				$data = http_build_query($data);			
+				$data = json_encode($data);
 			}
 		}
 		$requestBodyHash = $data;
@@ -127,7 +126,7 @@ class Client
 
 	/**
 	 * @param $route
-	 * @param $dataArray
+	 * @param $data
 	 * @return mixed
 	 * @throws \Exception
 	 */

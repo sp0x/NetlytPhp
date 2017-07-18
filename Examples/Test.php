@@ -1,23 +1,23 @@
 <?php
-
-
 use \Peeralytics\Client;
-require __DIR__ . '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-$appId = "5f059dbe7c3b48dz6b3aed518b54f1dc5";
-$secret = "tvIn6qz2sOKrgjPBP3PCfSVXESb0Hhn7IhZBKqhObVA=";
+$appId = "5ffghj9dbe7c3bsfgh18b54f1dc5";
+$secret = "BdfyjfghjbVA=";
 
 $client = new Peeralytics\Client($appId, $secret);
 $status = $client->get("data/GetStatus");
 var_dump($status);
+$newUser = [
+	'Name' => "Pesho",
+	"Id" => 1
+];
 
 $dataClient = $client->getDataClient();
-$status = $dataClient->createEntity([
-    'Name' => "Pesho"
-]);
+$status = $dataClient->createEntity($newUser);
 var_dump($status);
 
-$status = $dataClient->addEntityData([
+$status = $dataClient->addEntityData([ "Id" => $newUser['Id']], [
 	'Action' => 'SiteVisit'
 ]);
 
