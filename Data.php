@@ -1,8 +1,6 @@
 <?php
 namespace Peeralytics;
 
-use Peeralytics\Client;
-
 class Data{
 	private $client;
 	public function __construct(Client $client){
