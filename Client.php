@@ -37,6 +37,13 @@ class Client
 		$this->curl = curl_init();
 		$this->_cookieFile = "./cookie.tmp";
 		if($keepCookies){
+			if(file_exists($this->_cookieFile)){
+				try{
+					unlink($this->_cookieFile);
+				}catch(\Exception $e){
+
+				}
+			}
 			curl_setopt( $this->curl, CURLOPT_COOKIEJAR, $this->_cookieFile);
 			curl_setopt( $this->curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
 		}
