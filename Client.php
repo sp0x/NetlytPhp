@@ -128,7 +128,7 @@ class Client
 		if(!$response){
 			$statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
 			throw new \Exception("Error[$statusCode]: \"" . curl_error($this->curl) . '" - Err#: ' . curl_errno($this->curl));
-		} 
+		}
 		return $response;
 	}
 
