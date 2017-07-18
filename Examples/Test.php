@@ -12,8 +12,13 @@ $status = $client->get("data/GetStatus");
 var_dump($status);
 
 $dataClient = $client->getDataClient();
-$status = $dataClient->putEntity([
+$status = $dataClient->createEntity([
     'Name' => "Pesho"
+]);
+var_dump($status);
+
+$status = $dataClient->addEntityData([
+	'Action' => 'SiteVisit'
 ]);
 
 var_dump($status);
