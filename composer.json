@@ -1,7 +1,8 @@
 {
     "name": "peeralytics/client",
     "type": "library",
-    "authors": [
+  	"version": "1.0.0",
+  	"authors": [
         {
             "name": "vasko",
             "email": "vasil.vasilev94@yahoo.com"
