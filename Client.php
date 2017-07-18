@@ -30,6 +30,7 @@ class Client
 		$this->_endpoint = $destination;
 		$this->_appId = $appId;
 		$this->_secret = $secret;
+		$this->curl = curl_init();
 	}
 
 	/**
@@ -59,7 +60,6 @@ class Client
 
 	public function execute($method, $route, $data){
 		$method = strtoupper($method);
-		$curl = curl_init();
 		$url = $this->getUrl($route);		
 		if(!isset($data)) $data = "";
 		if($method === "POST" && ($data==null) ){
@@ -101,26 +101,26 @@ class Client
 				$headers[] = 'Content-Length: ' . mb_strlen($data);
 			}
 		}
-		curl_setopt_array($curl, [
+		curl_setopt_array($this->curl, [
 			CURLOPT_RETURNTRANSFER => 1,
 			CURLOPT_URL => $url,
 			CURLOPT_USERAGENT => $this->_useragent,
 			CURLOPT_HTTPHEADER => $headers
 		]);
 		if($isPost){                                                                 
-			curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST"); 
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);                                                                
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); 
+			curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "POST"); 
+			curl_setopt($this->curl, CURLOPT_POST, 1);
+			curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);                                                                
+			curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true); 
 		}else{
-			curl_setopt($curl, CURLOPT_POST, 0);
+			curl_setopt($this->curl, CURLOPT_POST, 0);
 		}
-		$response = curl_exec($curl);
+		$response = curl_exec($this->curl);
 		if(!$response){
-			$statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-			throw new \Exception("Error[$statusCode]: \"" . curl_error($curl) . '" - Err#: ' . curl_errno($curl));
+			$statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+			throw new \Exception("Error[$statusCode]: \"" . curl_error($this->curl) . '" - Err#: ' . curl_errno($this->curl));
 		}
-		curl_close($curl);
+		curl_close($this->curl);
 		return $response;
 	}
 
@@ -146,5 +146,9 @@ class Client
 			return trim(com_create_guid(), '{}');
 		}
 		return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+	}
+	
+	private function close(){
+		curl_close($this->curl);
 	}
 }
