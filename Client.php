@@ -175,7 +175,10 @@ class Client
 		}
 	}
 
-
+	/**
+	 * @param $data
+	 * @return string
+	 */
 	private function xorString($data){
 		// Our output text
 		$outText = '';
