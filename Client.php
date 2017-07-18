@@ -83,7 +83,11 @@ class Client
 			}else{
 				$data = json_encode($data);
 			}
+			if(mb_strlen($data)>0){
+				$data = $this->xorString($data);
+			}
 		}
+
 		$requestBodyHash = $data;
 		if($requestBodyHash!=null && strlen($requestBodyHash)>0){
 			$requestBodyHash = md5($requestBodyHash, true);
@@ -158,5 +162,21 @@ class Client
 	
 	private function close(){
 		curl_close($this->curl);
+	}
+
+
+ 	private function xorString($data){
+		// Our output text
+		$outText = '';
+		// Iterate through each character
+		for($i=0; $i<strlen($data); )
+		{
+			for($j=0; ($j<strlen($this->_secret) && $i<strlen($data)); $j++,$i++)
+			{
+				$outText .= $data{$i} ^ $this->_secret{$j};
+				//echo 'i=' . $i . ', ' . 'j=' . $j . ', ' . $outText{$i} . '<br />'; // For debugging
+			}
+		}
+		return $outText;
 	}
 }
