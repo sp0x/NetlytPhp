@@ -1,7 +1,7 @@
 {
     "name": "peeralytics/client",
     "type": "library",
-  	"version": "1.0.10",
+  	"version": "1.0.11",
   	"authors": [
         {
             "name": "vasko",

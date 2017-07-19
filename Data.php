@@ -26,4 +26,16 @@ class Data{
 		$data = array('data' => $data, 'filter' => $entityFilter);
 		return $this->client->post("EntityData" , $data);
 	}
+
+	/**
+	 * @param string|array $entityFilter
+	 * @param array $newEntityData
+	 * @return mixed
+	 * @internal param array|string $data
+	 */
+	public function updateEntity($entityFilter, $newEntityData){
+		if(!is_string($entityFilter)) $entityFilter = json_encode($entityFilter);
+		$data = array('data' => $newEntityData, 'filter' => $entityFilter);
+		return $this->client->post("EntityUpdate" , $data);
+	}
 }
