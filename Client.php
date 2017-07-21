@@ -23,7 +23,7 @@ class Client
 	private $_initialized;
 	private $_cookieFile;
 
-	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu:5000";
+	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu";
 
 	public function __construct($appId , $secret, $destination = Client::DEFAULT_ROUTE, $keepCookies = true){
 		if(strlen($destination)==null || $destination===null){
@@ -167,7 +167,7 @@ class Client
 		return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
 	}
 	
-	private function close(){
+	public function close(){
 		curl_close($this->curl);
 	}
 
