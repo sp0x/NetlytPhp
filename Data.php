@@ -38,4 +38,28 @@ class Data{
 		$data = array('data' => $newEntityData, 'filter' => $entityFilter);
 		return $this->client->post("EntityUpdate" , $data);
 	}
+
+	/**
+	 * @param string $userIdentifierField Example  "{ Id : 5 }" or [ Id => 5]
+	 * @param string $socialNetworkType Facebook for example
+	 * @param array $details Example [ userToken => social-network-user-token ]
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function createEntitySocialProfile($userIdentifierField, $socialNetworkType, $details)
+	{
+//		if(is_array($userIdentifierField)){
+//			$userIdentifierField = json_encode($userIdentifierField);
+//		}
+		$result = $this->client->post("SocialEntity", [
+			'userIdentifier' => $userIdentifierField,
+			'type' => $socialNetworkType,
+			'details' => $details
+		]);
+		$result = json_decode($result, true);
+		if(!$result["success"]){
+			throw new \Exception($result['message']);
+		}
+		return $result;
+	}
 }

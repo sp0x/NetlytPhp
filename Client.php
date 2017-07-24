@@ -22,6 +22,7 @@ class Client
 	private $_prefix;
 	private $_initialized;
 	private $_cookieFile;
+	private $_cacheCookies;
 
 	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu";
 
@@ -35,7 +36,9 @@ class Client
 		$this->_secret = $secret;
 		$this->_initialized = false;
 		$this->curl = curl_init();
-		$this->_cookieFile = "./cookie.tmp";
+		$path = getcwd() . DIRECTORY_SEPARATOR . "cookie_" . time() . ".tmp";
+		$this->_cookieFile = $path;
+		$this->_cacheCookies = $keepCookies;
 		if($keepCookies){
 			if(file_exists($this->_cookieFile)){
 				try{
@@ -44,6 +47,7 @@ class Client
 
 				}
 			}
+
 			curl_setopt( $this->curl, CURLOPT_COOKIEJAR, $this->_cookieFile);
 			curl_setopt( $this->curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
 		}
@@ -53,8 +57,25 @@ class Client
 	*
 	**/
 	public function getDataClient(){
-		$dtc = new Data($this);
+		$dtc = new Data($this->clone());
 		return $dtc;
+	}
+
+	public function clone(){
+		$cl = new Client($this->_appId, $this->_secret, $this->_endpoint, false);
+		//we share the handle to libcurl
+		$cl->curl = $this->curl;
+//		if($this->_cacheCookies){
+//			curl_setopt( $cl->curl, CURLOPT_COOKIESESSION, false);
+//			curl_setopt( $cl->curl, CURLOPT_COOKIEJAR, $this->_cookieFile);
+//			curl_setopt( $cl->curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
+//		}
+		$cl->_cacheCookies = $this->_cacheCookies;
+		$cl->_cookieFile = $this->_cookieFile;
+		$cl->_useragent = $this->_useragent;
+		$cl->_prefix = $this->_prefix;
+
+		return $cl;
 	}
 
 	public function setPrefix($pfx){
@@ -76,7 +97,8 @@ class Client
 
 	public function execute($method, $route, $data){
 		$method = strtoupper($method);
-		$url = $this->getUrl($route);		
+		$url = $this->getUrl($route);
+		//echo "Executing: $url\n";
 		if(!isset($data)) $data = "";
 		if($method === "POST" && ($data==null) ){
 			throw new \Exception("Invalid input data for post request!");
@@ -158,6 +180,38 @@ class Client
 		return $this->execute("get", $route, "");	
 	}
 
+	/**
+	 * Gets the required permissions
+	 * @param $type
+	 * @param array $permissionsArray Array in which to merge the new permissions
+	 * @return array The permissions that were required
+	 */
+	public function requirePermissions($type, &$permissionsArray){
+		$perms = $this->get("api/SocialPermissions?type=$type");
+		$perms = json_decode($perms, true);
+		if($perms && $perms["success"]){
+			$perms = $perms["data"]["required"];
+			$permissionsArray = array_merge($permissionsArray, $perms);
+			return $perms;
+		}
+		return [];
+	}
+
+	/**
+	 * @param $type
+	 * @param array $details Example [ appId => social-network-app-id, secret => social-network-app-secret]
+	 * @return mixed
+	 */
+	public function addSocialNetwork($type, $details){
+		return $this->post("api/RegisterSocialNetwork", [
+			'type' => $type,
+			'details'=> $details
+		]);
+	}
+
+
+
+
 	private function guid()
 	{
 		if (function_exists('com_create_guid') === true)
@@ -173,11 +227,16 @@ class Client
 
 	function __destruct()
 	{
+		$this->close();
+		unset($this->curl);
 		if(file_exists($this->_cookieFile)){
 			try{
-				unlink($this->_cookieFile);
+				$res = unlink($this->_cookieFile);
+				//$res = unlink($targetCookieFile);
+				//echo "Deleted $this->_cookieFile\n ";
+				//var_dump($res);
 			}catch(\Exception $e){
-
+				echo "Destructor err:R " . $e->getMessage();
 			}
 		}
 	}
