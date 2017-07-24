@@ -10,10 +10,6 @@ $client = new Peeralytics\Client($appId, $secret);
 $dataClient = $client->getDataClient();
 
 //To fetch the permissions, for facebook, we just call this
-$permissionsArray = ["email"];
-$client->requirePermissions("Facebook", $permissionsArray);
-
-var_dump($permissionsArray);
 
 //Whenever you have an authentication token from your user
 //for example after the user logs in, or in your fb-callback.php
@@ -25,6 +21,31 @@ $user = [
 	'name' => 'example name'
 ];
 
+
+/**
+ * facebook login permissions management example
+ */
+
+$fb = new Facebook\Facebook([
+	'app_id' => $fbAppId, //
+	'app_secret' => $fbAppSecret,
+	'default_graph_version' => 'v2.2',
+]);
+$permissionsArray = ["email"];
+$client->requirePermissions("Facebook", $permissionsArray);
+$helper = $fb->getRedirectLoginHelper("urlToRedirectToAfterLogin-Optional!");
+$url = $helper->getLoginUrl($permissionsArray);
+echo "Permissions: \n";
+var_dump($permissionsArray);
+echo "\n\nUrl: " . $url;
+
+
+
+
+/**
+ * facebook login callback example
+ */
+
 $fb = new Facebook\Facebook([
 	'app_id' => $fbAppId, //
 	'app_secret' => $fbAppSecret,
@@ -32,7 +53,6 @@ $fb = new Facebook\Facebook([
 ]);
 
 $helper = $fb->getRedirectLoginHelper();
-
 try {
 
 	$accessToken = "usertoken"; //$helper->getAccessToken();
