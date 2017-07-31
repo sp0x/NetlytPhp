@@ -23,6 +23,7 @@ class Client
 	private $_initialized;
 	private $_cookieFile;
 	private $_cacheCookies;
+	private $iv = "452871829734829374289375892375892";
 
 	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu";
 
@@ -113,7 +114,8 @@ class Client
 				$data = json_encode($data);
 			}
 			if(mb_strlen($data)>0){
-				$data = $this->xorString($data);
+				//$data = $this->xorString($data);
+				$data = $this->secureString($data);
 			}
 		}
 
@@ -241,6 +243,20 @@ class Client
 		}
 	}
 
+	private function secureString($data){
+		// to append string with trailing characters as for PKCS7 padding scheme
+		$block = mcrypt_get_block_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+		$padding = $block - (strlen($data) % $block);
+		$data .= str_repeat(chr($padding), $padding);
+
+		$crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $this->_secret, $data, MCRYPT_MODE_CBC, $this->iv);
+
+		// this is not needed here
+		//$crypttext = urlencode($crypttext);
+
+		$crypttext64=base64_encode($crypttext);
+		return $crypttext64;
+	}
 	/**
 	 * @param $data
 	 * @return string
