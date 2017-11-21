@@ -2,3 +2,4 @@
 vendor
 docker-compose.yml
 *.iml
+**cookie_*.tmp
