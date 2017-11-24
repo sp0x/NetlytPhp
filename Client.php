@@ -25,7 +25,7 @@ class Client
 	private $_cacheCookies;
 	private $iv = "452871829734829374289375892375892";
 
-	const DEFAULT_ROUTE = "http://api.vaskovasilev.eu";
+	const DEFAULT_ROUTE = "http://api.netlyt.com";
 
 	public function __construct($appId , $secret, $destination = Client::DEFAULT_ROUTE, $keepCookies = true){
 		if(strlen($destination)==null || $destination===null){
