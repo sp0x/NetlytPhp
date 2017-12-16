@@ -1,7 +1,7 @@
 {
     "name": "netlyt/client",
     "type": "library",
-  	"version": "1.0.12",
+  	"version": "1.0.13",
   	"authors": [
         {
             "name": "vasko",

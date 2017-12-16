@@ -1,5 +1,5 @@
 <?php
-namespace Peeralytics;
+namespace Netlyt;
 
 class Netlyt
 {
