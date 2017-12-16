@@ -235,17 +235,8 @@ class Client
 
 	private function secureString($data){
 		// to append string with trailing characters as for PKCS7 padding scheme
-		$block = mcrypt_get_block_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-		$padding = $block - (strlen($data) % $block);
-		$data .= str_repeat(chr($padding), $padding);
-
-		$crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $this->_secret, $data, MCRYPT_MODE_CBC, $this->iv);
-
-		// this is not needed here
-		//$crypttext = urlencode($crypttext);
-
-		$crypttext64=base64_encode($crypttext);
-		return $crypttext64;
+		$data = $this->xorString($data);
+		return $data;
 	}
 	/**
 	 * @param $data
