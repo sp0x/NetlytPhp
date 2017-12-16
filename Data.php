@@ -1,7 +1,7 @@
 <?php
 namespace Netlyt;
 
-class Netlyt
+class Data
 {
 	private $client;
 	public function __construct(Client $client){

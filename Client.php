@@ -1,14 +1,5 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: cyb3r
- * Date: 02-Jul-17
- * Time: 7:08 PM
- */
-
+<?php 
 namespace Netlyt;
-
-
 
 class Client
 {
