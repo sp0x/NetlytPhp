@@ -1,7 +1,8 @@
 <?php
 namespace Peeralytics;
 
-class Data{
+class Netlyt
+{
 	private $client;
 	public function __construct(Client $client){
 		$this->client = $client;

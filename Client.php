@@ -6,7 +6,7 @@
  * Time: 7:08 PM
  */
 
-namespace Peeralytics;
+namespace Netlyt;
 
 
 
@@ -17,7 +17,7 @@ class Client
 	 */ 
 	private $_appId;
 	private $_endpoint;
-	private $_useragent = "Peeralytics PHP";
+	private $_useragent = "Netlyt PHP";
 	private $_secret;
 	private $_prefix;
 	private $_initialized;
@@ -48,7 +48,6 @@ class Client
 
 				}
 			}
-
 			curl_setopt( $this->curl, CURLOPT_COOKIEJAR, $this->_cookieFile);
 			curl_setopt( $this->curl, CURLOPT_COOKIEFILE, $this->_cookieFile);
 		}
