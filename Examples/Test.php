@@ -1,12 +1,12 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-use \Peeralytics\Client;
+use \Netlyt\Client;
 
 $appId = "5f0sdfghc5";
 $secret = "Bvsdfgj=";
 
 
-$client = new Peeralytics\Client($appId, $secret);
+$client = new Netlyt\Client($appId, $secret);
 //Get the status of our client
 $status = $client->get("data/GetStatus");
 

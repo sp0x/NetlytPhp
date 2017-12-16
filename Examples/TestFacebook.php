@@ -1,12 +1,12 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-use \Peeralytics\Client;
+use \Netlyt\Client;
 
 $appId = "5f05sdfhsdfgh";
 $secret = "BvIsdfhgA=";
 
 
-$client = new Peeralytics\Client($appId, $secret);
+$client = new Netlyt\Client($appId, $secret);
 $dataClient = $client->getDataClient();
 
 //To fetch the permissions, for facebook, we just call this

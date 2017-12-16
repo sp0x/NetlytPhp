@@ -57,7 +57,7 @@ class Client
 	*
 	**/
 	public function getDataClient(){
-		$dtc = new Data($this->clone());
+		$dtc = new \Netlyt\Data($this->clone());
 		return $dtc;
 	}
 
