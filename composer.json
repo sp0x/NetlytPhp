@@ -1,5 +1,5 @@
 {
-    "name": "peeralytics/client",
+    "name": "netlyt/client",
     "type": "library",
   	"version": "1.0.12",
   	"authors": [
@@ -10,7 +10,7 @@
     ],
     "autoload" : {
             "psr-4" : {
-                "Peeralytics\\" : "."
+                "Netlyt\\" : "."
             }
     },
     "require": {
