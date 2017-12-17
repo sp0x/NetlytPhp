@@ -131,7 +131,9 @@ class Client
 		$headers[] = "Authorization: Hmac " . base64_encode($authHeaderValue);
 		if($isPost){
 			$headers[] = 'Content-Type: application/x-www-form-urlencoded';
-			if($data!=null){
+			//TODO: Implement chunked send for bigger requests
+			//$headers[] = "Transfer-Encoding: chunked";
+			if(isset($data)){
 				$headers[] = 'Content-Length: ' . mb_strlen($data);
 			}
 		}
@@ -141,13 +143,15 @@ class Client
 			CURLOPT_USERAGENT => $this->_useragent,
 			CURLOPT_HTTPHEADER => $headers
 		]);
+		//echo "Sending headers to: " . ($isPost ? "POST" : "GET") . "($method) $url\n";
+		//var_dump($headers);
 		if($isPost){                                                                 
 			curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "POST"); 
 			curl_setopt($this->curl, CURLOPT_POST, 1);
 			curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);                                                                
-			curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true); 
+			curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
 		}else{
-			curl_setopt($this->curl, CURLOPT_POST, 0);
+			//curl_setopt($this->curl, CURLOPT_POST, 0);
 		}
 		$response = curl_exec($this->curl);
 		if(!$response){
