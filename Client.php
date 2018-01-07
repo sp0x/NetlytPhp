@@ -15,6 +15,8 @@ class Client
 	private $_cookieFile;
 	private $_cacheCookies;
 	private $iv = "452871829734829374289375892375892";
+	private $_clientVersion = "1.0.0";
+	private $_authorized = false;
 
 	const DEFAULT_ROUTE = "http://api.netlyt.com";
 
@@ -65,7 +67,7 @@ class Client
 		$cl->_cookieFile = $this->_cookieFile;
 		$cl->_useragent = $this->_useragent;
 		$cl->_prefix = $this->_prefix;
-
+		$cl->_authorized = $this->_authorized;
 		return $cl;
 	}
 
@@ -85,30 +87,44 @@ class Client
 		return $url;
 	}
  
+	private function executeAuthorized($method, $url, $data){
+		$headers = [];
+		$response = $this->executeRaw($method, $url, $data, $headers);
+		if(!$response){
+			$statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+			throw new \Exception("Error[$statusCode]: \"" . curl_error($this->curl) . '" - Err#: ' . curl_errno($this->curl));
+		}
+		//echo "Response: \n";
+		//var_dump($response);
+		return $response;
+	}
 
 	public function execute($method, $route, $data){
 		$method = strtoupper($method);
 		$url = $this->getUrl($route);
 		//echo "Executing: $url\n";
 		if(!isset($data)) $data = "";
+		if(is_string($data)){
+		}else{
+			$data = json_encode($data);
+		}
 		if($method === "POST" && ($data==null) ){
 			throw new \Exception("Invalid input data for post request!");
+		}
+		
+		if($this->_authorized){
+			return $this->executeAuthorized($method, $url, $data);
 		}
 		$tnow = time();
 		$nonce = $this->guid();  
 		$safeRoute = urlencode($url);
 		//Data parsing
 		if($data!==null){
-			if(is_string($data)){
-			}else{
-				$data = json_encode($data);
-			}
-			if(mb_strlen($data)>0){
-				//$data = $this->xorString($data);
+			
+			if(mb_strlen($data)>0 && !$this->_authorized){ 
 				$data = $this->secureString($data);
 			}
 		}
-
 		$requestBodyHash = $data;
 		if($requestBodyHash!=null && strlen($requestBodyHash)>0){
 			$requestBodyHash = md5($requestBodyHash, true);
@@ -116,19 +132,36 @@ class Client
 		} else {
 			$requestBodyHash = "";
 		}
-
+		
 		$signiture = "{$this->_appId}{$method}{$safeRoute}{$tnow}{$nonce}{$requestBodyHash}";
 		$secretBytes = base64_decode($this->_secret);
 		$signiture = hash_hmac("sha256", $signiture, $secretBytes, true);
 		$signiture = base64_encode($signiture);
-
 		$authHeaderValue = "{$this->_appId}:$tnow:$nonce:$signiture";
-		$isPost = $method==="POST";
 		$headers = [];
+		$headers[] = "Authorization: Hmac " . base64_encode($authHeaderValue);
+		//echo "Sending unauthorized..\n";
+		$response = $this->executeRaw($method, $url, $data, $headers);
+		
+		$this->_authorized = true;
+		if(!$response){
+			$statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+			throw new \Exception("Error[$statusCode]: \"" . curl_error($this->curl) . '" - Err#: ' . curl_errno($this->curl));
+		}
+		//echo "Response: \n";
+		//var_dump($response);
+		return $response;
+	}
+
+	private function executeRaw($method, $url, $data, $headers){
+		$method = strtoupper($method);
+		$isPost = $method==="POST"; 
+		if(!isset($headers)) $headers = [];
 		$headers[] = "Accept-Encoding: gzip, deflate";
 		$headers[] = "Accept-Language: en-US,en;q=0.5";
 		$headers[] = "Cache-Control: no-cache";
-		$headers[] = "Authorization: Hmac " . base64_encode($authHeaderValue);
+		$headers[] = "ClientVersion: {$this->_clientVersion}";
+
 		if($isPost){
 			$headers[] = 'Content-Type: application/x-www-form-urlencoded';
 			//TODO: Implement chunked send for bigger requests
@@ -145,6 +178,7 @@ class Client
 		]);
 		//echo "Sending headers to: " . ($isPost ? "POST" : "GET") . "($method) $url\n";
 		//var_dump($headers);
+		//var_dump($data);
 		if($isPost){                                                                 
 			curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "POST"); 
 			curl_setopt($this->curl, CURLOPT_POST, 1);
@@ -154,10 +188,6 @@ class Client
 			//curl_setopt($this->curl, CURLOPT_POST, 0);
 		}
 		$response = curl_exec($this->curl);
-		if(!$response){
-			$statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-			throw new \Exception("Error[$statusCode]: \"" . curl_error($this->curl) . '" - Err#: ' . curl_errno($this->curl));
-		}
 		return $response;
 	}
 
@@ -183,12 +213,17 @@ class Client
 	 * @return array The permissions that were required
 	 */
 	public function requirePermissions($type, &$permissionsArray){
-		$perms = $this->get("api/SocialPermissions?type=$type");
+		$perms = $this->get("social/Permissions?type=$type");
 		$perms = json_decode($perms, true);
 		if($perms && $perms["success"]){
+			if(!isset($perms["data"]["required"])){
+				return [];
+			}
 			$perms = $perms["data"]["required"];
 			$permissionsArray = array_merge($permissionsArray, $perms);
 			return $perms;
+		}else{
+			throw new \Exception("Could not require permission of type: $type");
 		}
 		return [];
 	}
@@ -199,7 +234,7 @@ class Client
 	 * @return mixed
 	 */
 	public function addSocialNetwork($type, $details){
-		return $this->post("api/RegisterSocialNetwork", [
+		return $this->post("social/RegisterSocialNetwork", [
 			'type' => $type,
 			'details'=> $details
 		]);
