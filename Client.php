@@ -18,7 +18,7 @@ class Client
 	private $_clientVersion = "1.0.0";
 	private $_authorized = false;
 
-	const DEFAULT_ROUTE = "http://api.netlyt.com";
+	const DEFAULT_ROUTE = "http://api.netlyt.io";
 
 	public function __construct($appId , $secret, $destination = Client::DEFAULT_ROUTE, $keepCookies = true){
 		if(strlen($destination)==null || $destination===null){
